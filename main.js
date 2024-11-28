@@ -6,32 +6,44 @@ import WebGL from 'three/addons/capabilities/WebGL.js';
 const w = window.innerWidth;
 const h = window.innerHeight;
 
-//se crea la escena y se ponce color
+//creamos la camara y le ponemos la posición de Z para que se vea el cubo (0,0,0)
+const fov = 75;
+const aspect = 2; //canvas default
+const near = 0.1;
+const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, w/h, near, far);
+camera.position.z = 5;
+
+//se crea la escena y se pone color
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
-
-//creamos la camara y le ponemos la posición de Z para que se vea el cubo (0,0,0)
-const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100);
-camera.position.z = 5;
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(w, h);
 document.body.appendChild(renderer.domElement);
 
-const geometry = new THREE.BoxGeometry();
+//creacion de la caja con medidas especificas
+const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 //THREE.MeshBasicMaterial si el material no se afecta por la luz
 const material = new THREE.MeshStandardMaterial({
     color: 0x00ff00
 });
 const cube = new THREE.Mesh(geometry, material);
-cube.scale.setScalar(2);
-scene.add(cube);
+cube.scale.setScalar(1);
+//scene.add(cube);
 
 //se agrega la luz para afectar al material standard
-const hemLight = new THREE.HemisphereLight(0xffffff, 0x444444);
-scene.add(hemLight);
+//const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+const color = 0xffffff;
+const intensity = 3;
+const light = new THREE.DirectionalLight(color, intensity);
+light.position.set(-1, 2, 4);
+scene.add(light);
 
-function animate(){
+function animate(){    
     requestAnimationFrame(animate);
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
@@ -39,16 +51,48 @@ function animate(){
 }
 //animate();
 
-//revisar si tiene compatibilidad con webGL2
-if(WebGL.isWebGL2Available()){
-    // Initiate function or other initializations here
-    animate();
+//para crear un nuevo material con color específico
+function makeInstance(geometry, color, positionX){
+    const newMaterial = new THREE.MeshStandardMaterial({color});
+    const newCube = new THREE.Mesh(geometry, newMaterial);
+    scene.add(newCube);
+    newCube.position.x = positionX;
+    return newCube; 
+}
+
+//cargo los cubos a partir de la funcion anterior
+const cubes = [
+    makeInstance(geometry, 0x44aa88, 0),
+    makeInstance(geometry, 0x8844aa, -2),
+    makeInstance(geometry, 0xaa8844, 2),
+];
+
+//para girar los 3 cubos instanciados
+function newRender(time){
+      
+    time *= 0.001;
+    cubes.forEach((cube, ndx) => {
+        const speed = 1 + ndx * .1;
+        //const speed = .1;
+        const rotation = time * speed;
+        cube.rotation.x = rotation;
+        cube.rotation.y = rotation;
+    });
     renderer.render(scene, camera);
+    requestAnimationFrame(newRender);  
 }
-else
-{
-    const warning = WebGL.getWebGL2ErrorMessage();
-    document.getElementById('container').appendChild(warning);
-}
+requestAnimationFrame(newRender);
+//revisar si tiene compatibilidad con webGL2
+// if(WebGL.isWebGL2Available()){
+//     // Initiate function or other initializations here
+//     //animate();
+//     newRender();
+//     renderer.render(scene, camera);
+// }
+// else
+// {
+//     const warning = WebGL.getWebGL2ErrorMessage();
+//     document.getElementById('container').appendChild(warning);
+// }
 //lo edité y puse dentro del if de webGL2 support
 //renderer.render(scene, camera);
