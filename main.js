@@ -1,7 +1,10 @@
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
-import {FirstPersonControls} from 
-'three/examples/jsm/controls/FirstPersonControls.js';
+// 1 si quieremos tener FPC
+// import {FirstPersonControls} from 
+// 'three/examples/jsm/controls/FirstPersonControls.js';
+import {OrbitControls} from 
+'three/examples/jsm/controls/OrbitControls';
 
 
 
@@ -72,21 +75,15 @@ const cubes = [
 ];
 
 //prueba para el orbit
-const fpControls = new FirstPersonControls(camera, renderer.domElement);
+//const fpControls = new FirstPersonControls(camera, renderer.domElement);
+const orbitControls = new OrbitControls(camera, renderer.domElement);
+orbitControls.update();
 const clock = new THREE.Clock();
 
 //para girar los 3 cubos instanciados
 function newRender(time){      
     time *= 0.001;
-    fpControls.update(clock.getDelta());
-    // const canvas = renderer.domElement;
-    // camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    
-    // if(resizeRendererToDisplaySize(newRender)){
-    //     const canvas = renderer.domElement;
-    //     camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    //     camera.updateProjectionMatrix();
-    // }
+    //fpControls.update(clock.getDelta());
 
     cubes.forEach((cube, ndx) => {
         const speed = 1 + ndx * .1;
@@ -99,15 +96,3 @@ function newRender(time){
     requestAnimationFrame(newRender);  
 }
 requestAnimationFrame(newRender);
-
-
-// function resizeRendererToDisplaySize(renderer){
-//     const canvas = renderer.domElement;
-//     const widthC = canvas.clientWidth;
-//     const heigthC = canvas.clientHeight;
-//     const needResize = canvas.clientWidth !== widthC || canvas.heigthClient !== heigthC;
-//     if(needResize){
-//         renderer.setSize(widthClient, heigthClient, false);
-//     }
-//     return needResize;
-// }
