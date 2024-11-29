@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
+import {FirstPersonControls} from 
+'three/examples/jsm/controls/FirstPersonControls.js';
+
 
 
 //para marcar el canvas donde trabajaremos
@@ -13,6 +16,7 @@ const near = 0.1;
 const far = 100;
 const camera = new THREE.PerspectiveCamera(fov, w/h, near, far);
 camera.position.z = 5;
+
 
 //se crea la escena y se pone color
 const scene = new THREE.Scene();
@@ -67,10 +71,23 @@ const cubes = [
     makeInstance(geometry, 0xaa8844, 2),
 ];
 
+//prueba para el orbit
+const fpControls = new FirstPersonControls(camera, renderer.domElement);
+const clock = new THREE.Clock();
+
 //para girar los 3 cubos instanciados
-function newRender(time){
-      
+function newRender(time){      
     time *= 0.001;
+    fpControls.update(clock.getDelta());
+    // const canvas = renderer.domElement;
+    // camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    
+    // if(resizeRendererToDisplaySize(newRender)){
+    //     const canvas = renderer.domElement;
+    //     camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    //     camera.updateProjectionMatrix();
+    // }
+
     cubes.forEach((cube, ndx) => {
         const speed = 1 + ndx * .1;
         //const speed = .1;
@@ -82,17 +99,15 @@ function newRender(time){
     requestAnimationFrame(newRender);  
 }
 requestAnimationFrame(newRender);
-//revisar si tiene compatibilidad con webGL2
-// if(WebGL.isWebGL2Available()){
-//     // Initiate function or other initializations here
-//     //animate();
-//     newRender();
-//     renderer.render(scene, camera);
+
+
+// function resizeRendererToDisplaySize(renderer){
+//     const canvas = renderer.domElement;
+//     const widthC = canvas.clientWidth;
+//     const heigthC = canvas.clientHeight;
+//     const needResize = canvas.clientWidth !== widthC || canvas.heigthClient !== heigthC;
+//     if(needResize){
+//         renderer.setSize(widthClient, heigthClient, false);
+//     }
+//     return needResize;
 // }
-// else
-// {
-//     const warning = WebGL.getWebGL2ErrorMessage();
-//     document.getElementById('container').appendChild(warning);
-// }
-//lo edité y puse dentro del if de webGL2 support
-//renderer.render(scene, camera);
